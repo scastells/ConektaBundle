@@ -1,7 +1,7 @@
 {
   "name": "scastells/conekta-bundle",
   "type": "symfony-bundle",
-  "description": "Banwire Bundle, part of Mmoreram Payment Suite",
+  "description": "Conekta Bundle, part of Mmoreram uuuuuhhh Payment Suite",
   "keywords": ["Conekta", "payment", "ecommerce"],
   "license": "MIT",
   "authors": [
@@ -19,7 +19,8 @@
     "symfony/http-kernel": ">=2.2.3",
     "symfony/dependency-injection": ">=2.2.3",
     "twig/twig": "~1.11",
-    "paymentsuite/payment-core-bundle": "~1.1"
+    "paymentsuite/payment-core-bundle": "~1.1",
+    "conekta/conekta-php": "master"
   },
   "target-dir": "Scastells/ConektaBundle",
   "autoload": {

@@ -1,0 +1,17 @@
+services:
+    conekta.manager:
+        class: Fancy\ConektaBundle\Services\ConektaManager
+        arguments:
+            - @payment.event.dispatcher
+            - @payment.bridge
+            - %conekta.api.key%
+
+    conekta.oxxo_routes.loader:
+        class: Fancy\ConektaBundle\Router\ConektaOxxoRouterLoader
+        arguments:
+            - %fancy_conekta.oxxo.controller.route.name%
+            - %conekta.oxxo_execute.route%
+            - %conekta.oxxo_notify.route%
+            - %fancy_conekta.oxxo.controller.route.notify.name%
+        tags:
+            - { name: routing.loader }

@@ -9,6 +9,6 @@ namespace Fancy\ConektaBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class ConektaBundle extends Bundle
+class FancyConektaBundle extends Bundle
 {
 }

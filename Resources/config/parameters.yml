@@ -1,0 +1,3 @@
+parameters:
+    fancy_conekta.oxxo.controller.route.name: "conekta_oxxo_execute"
+    fancy_conekta.oxxo.controller.route.notify.name: "conekta_oxxo_notify"

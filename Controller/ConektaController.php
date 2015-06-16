@@ -6,9 +6,9 @@
  * Time: 12:47
  */
 
-namespace Fancy\ConektaBundle\Controller;
+namespace Scastells\ConektaBundle\Controller;
 
-use Fancy\ConektaBundle\Model\Paymethods\ConektaOxxoPaymentMethod;
+use Scastells\ConektaBundle\Model\PayMethods\ConektaOxxoPaymentMethod;
 use PaymentSuite\PaymentCoreBundle\Exception\PaymentOrderNotFoundException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,6 +36,8 @@ class ConektaController extends Controller
 
             throw new PaymentOrderNotFoundException;
         }
+
+        $this->get('payment.event.dispatcher')->notifyPaymentOrderCreated($paymentBridge, $paymentMethod);
 
         try {
             $this->get('conekta.manager')->processOxxoPayment($paymentBridge, $paymentMethod);

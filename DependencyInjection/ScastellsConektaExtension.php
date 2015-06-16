@@ -6,14 +6,14 @@
  * Time: 17:02
  */
 
-namespace Fancy\ConektaBundle\DependencyInjection;
+namespace Scastells\ConektaBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
-class FancyConektaExtension extends Extension
+class ScastellsConektaExtension extends Extension
 {
     /**
      * @param array $configs

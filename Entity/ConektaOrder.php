@@ -6,7 +6,7 @@
  * Time: 16:02
  */
 
-namespace Fancy\ConektaBundle\Entity;
+namespace Scastells\ConektaBundle\Entity;
 
 use BaseEcommerce\Bundles\Core\CoreBundle\Entity\Abstracts\AbstractEntity;
 use BaseEcommerce\Bundles\Core\PurchaseBundle\Entity\Order;
@@ -15,7 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Class ConektaOrder
  *
- * @package Fancy\ConektaBundle\Entity
+ * @package Scastells\ConektaBundle\Entity
  * @ORM\Entity()
  * @ORM\Table(name="conekta_order")
  */

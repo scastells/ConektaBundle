@@ -6,7 +6,7 @@
  * Time: 17:47
  */
 
-namespace Fancy\ConektaBundle\Router;
+namespace Scastells\ConektaBundle\Router;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
@@ -70,13 +70,13 @@ class ConektaOxxoRouterLoader implements LoaderInterface
         $routes->add(
             $this->controllerOxxoRouteName,
             new Route($this->controllerOxxoRoute, array(
-                '_controller' => 'FancyConektaBundle:Conekta:executeOxxo',
+                '_controller' => 'ScastellsConektaBundle:Conekta:executeOxxo',
             ))
         );
         $routes->add(
             $this->controllerOxxoNotifyRouteName,
             new Route($this->controllerOxxoNotifyRoute, array(
-                '_controller' => 'FancyConektaBundle:Conekta:NotifyOxxo',
+                '_controller' => 'ScastellsConektaBundle:Conekta:NotifyOxxo',
             ))
         );
         $this->loaded = true;

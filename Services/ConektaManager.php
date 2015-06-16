@@ -5,11 +5,11 @@
  * Date: 8/06/15
  * Time: 13:32
  */
-namespace Fancy\ConektaBundle\Services;
+namespace Scastells\ConektaBundle\Services;
 
-use Fancy\ConektaBundle\Model\Paymethods\ConektaOxxoPaymentMethod;
+use PaymentSuite\PaymentCoreBundle\Exception\PaymentException;
+use Scastells\ConektaBundle\Model\Paymethods\ConektaOxxoPaymentMethod;
 use PaymentSuite\PaymentCoreBundle\Exception\PaymentAmountsNotMatchException;
-use PaymentSuite\PaymentCoreBundle\Services\Interfaces\PaymentBridgeInterface;
 use PaymentSuite\PaymentCoreBundle\Services\PaymentEventDispatcher;
 
 class ConektaManager
@@ -21,29 +21,21 @@ class ConektaManager
     protected $paymentEventDispatcher;
 
     /**
-     * @var PaymentBridgeInterface
+     * @var ConektaWrapper
      */
-    protected $paymentBridge;
-
-    /**
-     * @var string
-     */
-    protected $apiKey;
+    protected $conektaWrapper;
 
     /**
      * @param PaymentEventDispatcher $paymentEventDispatcher
-     * @param PaymentBridgeInterface $paymentBridge
-     * @param string $apiKey
+     * @param ConektaWrapper $conektaWrapper
      */
     public function __construct(
         PaymentEventDispatcher $paymentEventDispatcher,
-        PaymentBridgeInterface $paymentBridge,
-        $apiKey
+        ConektaWrapper $conektaWrapper
     )
     {
         $this->paymentEventDispatcher = $paymentEventDispatcher;
-        $this->paymentBridge = $paymentBridge;
-        $this->apiKey = $apiKey;
+        $this->conektaWrapper = $conektaWrapper;
     }
 
     /**
@@ -51,27 +43,41 @@ class ConektaManager
      *
      * @throws PaymentException
      */
-    public function processOxxoPayment(ConektaOxxoPaymentMethod $paymentMethod)
+    public function processOxxoPayment($paymentBridge, ConektaOxxoPaymentMethod $paymentMethod)
     {
-        $paymentMethod->setReferenceId($this->paymentBridge->getOrderId() . '#' . date('Ymdhis'));
+        $paymentMethod->setReferenceId($paymentBridge->getOrderId() . '#' . date('Ymdhis'));
 
-        $paymentBridgeAmount = $this->paymentBridge->getAmount();
-        $extraData = $this->paymentBridge->getExtraData();
+        $paymentBridgeAmount = $paymentBridge->getAmount();
+        $extraData = $paymentBridge->getExtraData();
 
-        //move this code in a function from wrapprer Conekta
         try {
-            Conekta::setApikey($this->apiKey);
-            $charge = Conekta_Charge::create(array(
-                "amount"=> $paymentBridgeAmount,
-                "currency"=> "MXN", //config file
-                "description"=> $extraData['description'],
-                "cash"=> array(
-                    "type"=>$paymentMethod::TYPE_METHOD,
-                    "expires_at"=>"2015-03-04"
+
+            $params = array(
+                "amount"     => $paymentBridgeAmount * 100,
+                "currency"   => $this->conektaWrapper->getCurrency(),
+                "description" => $extraData['description'],
+                "cash" => array(
+                    "type"       => $paymentMethod::TYPE_METHOD,
+                    "expires_at" => "2015-06-30"
                 )
-            ));
-            //send email to user with barcode
-            $this->get('payment.event.dispatcher')->notifyPaymentOrderDone($this->paymentBridge, $paymentMethod);
+            );
+            $this->conektaWrapper->conektaSetApi();
+            $charge = $this->conektaWrapper->conektaCharge($params);
+
+            $paymentMethod
+                ->setType($charge->payment_method->type)
+                ->setStatus($charge->status)
+                ->setBarCode($charge->payment_method->barcode)
+                ->setBarCoderUrl($charge->payment_method->barcode_url);
+
+
+            if ($charge->failure_code != null && $charge->status != 'pending_payment') {
+                $this->paymentEventDispatcher->notifyPaymentOrderFail($paymentBridge, $paymentMethod);
+                throw new PaymentException();
+            }
+
+            $this->paymentEventDispatcher->notifyPaymentOrderDone($paymentBridge, $paymentMethod);
+
         }catch (Conekta_Error $e) {
 
             throw new PaymentException();

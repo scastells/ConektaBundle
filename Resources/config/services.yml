@@ -1,17 +1,33 @@
 services:
     conekta.manager:
-        class: Fancy\ConektaBundle\Services\ConektaManager
+        class: Scastells\ConektaBundle\Services\ConektaManager
         arguments:
             - @payment.event.dispatcher
-            - @payment.bridge
-            - %conekta.api.key%
+            - @contekta.wrapper
 
     conekta.oxxo_routes.loader:
-        class: Fancy\ConektaBundle\Router\ConektaOxxoRouterLoader
+        class: Scastells\ConektaBundle\Router\ConektaOxxoRouterLoader
         arguments:
-            - %fancy_conekta.oxxo.controller.route.name%
+            - %conekta.oxxo.controller.route.name%
             - %conekta.oxxo_execute.route%
             - %conekta.oxxo_notify.route%
-            - %fancy_conekta.oxxo.controller.route.notify.name%
+            - %conekta.oxxo.controller.route.notify.name%
         tags:
             - { name: routing.loader }
+
+    contekta.wrapper:
+        class: Scastells\ConektaBundle\Services\ConektaWrapper
+        arguments:
+              - %conekta.currency%
+              - %conekta.api.key%
+
+    pagosonline_gateway.event.listener:
+        class: Scastells\ConektaBundle\EventListener\ConektaListener
+        arguments:
+            - @mailer
+            - @templating
+            - @translator
+            - @doctrine.orm.entity_manager
+            - @baseecommerce.core.purchase.services.order_manager
+        tags:
+            - { name: kernel.event_listener, event: payment.order.done, method: onPaymentOrderDone }

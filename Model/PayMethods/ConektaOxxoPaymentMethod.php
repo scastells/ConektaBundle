@@ -6,7 +6,7 @@
  * Time: 15:44
  */
 
-namespace Fancy\ConektaBundle\Model\Paymethods;
+namespace Scastells\ConektaBundle\Model\PayMethods;
 
 use PaymentSuite\PaymentCoreBundle\PaymentMethodInterface;
 
@@ -44,6 +44,21 @@ class ConektaOxxoPaymentMethod implements PaymentMethodInterface
     protected $referenceId;
 
     /**
+     * @var string
+     */
+    protected $status;
+
+    /**
+     * @var string
+     */
+    protected $barCode;
+
+    /**
+     * @var string
+     */
+    protected $barCoderUrl;
+
+    /**
      * @return string
      */
     public function getDescription()
@@ -53,10 +68,14 @@ class ConektaOxxoPaymentMethod implements PaymentMethodInterface
 
     /**
      * @param string $description
+     *
+     * @return $this
      */
     public function setDescription($description)
     {
         $this->description = $description;
+
+        return $this;
     }
 
     /**
@@ -69,10 +88,14 @@ class ConektaOxxoPaymentMethod implements PaymentMethodInterface
 
     /**
      * @param float $amount
+     *
+     * @return $this
      */
     public function setAmount($amount)
     {
         $this->amount = $amount;
+
+        return $this;
     }
 
     /**
@@ -85,10 +108,14 @@ class ConektaOxxoPaymentMethod implements PaymentMethodInterface
 
     /**
      * @param string $currency
+     *
+     * @return $this
      */
     public function setCurrency($currency)
     {
         $this->currency = $currency;
+
+        return $this;
     }
 
     /**
@@ -101,10 +128,14 @@ class ConektaOxxoPaymentMethod implements PaymentMethodInterface
 
     /**
      * @param string $type
+     *
+     * @return $this
      */
     public function setType($type)
     {
         $this->type = $type;
+
+        return $this;
     }
 
     /**
@@ -117,10 +148,14 @@ class ConektaOxxoPaymentMethod implements PaymentMethodInterface
 
     /**
      * @param int $expiresAt
+     *
+     * @return $this
      */
     public function setExpiresAt($expiresAt)
     {
         $this->expiresAt = $expiresAt;
+
+        return $this;
     }
 
     /**
@@ -133,11 +168,76 @@ class ConektaOxxoPaymentMethod implements PaymentMethodInterface
 
     /**
      * @param string $referenceId
+     *
+     * @return $this
      */
     public function setReferenceId($referenceId)
     {
         $this->referenceId = $referenceId;
+
+        return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param string $status
+     *
+     * @return $this
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBarCode()
+    {
+        return $this->barCode;
+    }
+
+    /**
+     * @param string $barCode
+     *
+     * @return $this
+     */
+    public function setBarCode($barCode)
+    {
+        $this->barCode = $barCode;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBarCoderUrl()
+    {
+        return $this->barCoderUrl;
+    }
+
+    /**
+     * @param string $barCoderUrl
+     *
+     * @return $this
+     */
+    public function setBarCoderUrl($barCoderUrl)
+    {
+        $this->barCoderUrl = $barCoderUrl;
+
+        return $this;
+    }
+
 
     /**
      * Return type of payment name

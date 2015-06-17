@@ -31,28 +31,28 @@ class ConektaOrder extends AbstractEntity
     /**
      * @var string $orderId
      *
-     * @ORM\Column(name="conekta_id", type="string", length=255, nullable=false)
+     * @ORM\Column(name="conekta_id", type="string", length=255, nullable=true)
      */
     protected $conektaId;
 
     /**
      * @var string $status
      *
-     * @ORM\Column(name="status", type="string", length=255, nullable=false)
+     * @ORM\Column(name="status", type="string", length=255, nullable=true)
      */
     protected $status;
 
     /**
      * @var string $failure_code
      *
-     * @ORM\Column(name="failure_code", type="string", length=255, nullable=false)
+     * @ORM\Column(name="failure_code", type="string", length=255, nullable=true)
      */
     protected $failureCode;
 
     /**
      * @var string $type
      *
-     * @ORM\Column(name="type", type="string", length=255, nullable=false)
+     * @ORM\Column(name="type", type="string", length=255, nullable=true)
      */
     protected $type;
 

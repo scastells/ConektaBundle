@@ -15,13 +15,23 @@ services:
         tags:
             - { name: routing.loader }
 
+    spei_routes.loader:
+            class: Scastells\ConektaBundle\Router\SpeiRouterLoader
+            arguments:
+                - %conekta.spei.controller.route.name%
+                - %conekta.spei_execute.route%
+                - %conekta.spei_notify.route%
+                - %conekta.spei.controller.route.notify.name%
+            tags:
+                - { name: routing.loader }
+
     contekta.wrapper:
         class: Scastells\ConektaBundle\Services\ConektaWrapper
         arguments:
               - %conekta.currency%
               - %conekta.api.key%
 
-    pagosonline_gateway.event.listener:
+    conekta.event.listener:
         class: Scastells\ConektaBundle\EventListener\ConektaListener
         arguments:
             - @mailer
@@ -31,3 +41,4 @@ services:
             - @baseecommerce.core.purchase.services.order_manager
         tags:
             - { name: kernel.event_listener, event: payment.order.done, method: onPaymentOrderDone }
+            - { name: kernel.event_listener, event: payment.order.success, method: onPaymentOrderSucces }

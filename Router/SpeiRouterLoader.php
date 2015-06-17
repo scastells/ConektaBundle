@@ -13,54 +13,54 @@ use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-class ConektaOxxoRouterLoader implements LoaderInterface
+class SpeiRouterLoader implements LoaderInterface
 {
 
     /**
      * @var string
      * Execution controller route name
      */
-    protected $controllerOxxoRouteName;
+    protected $controllerSpeiRouteName;
 
     /**
      * @var string
      * Execution controller route
      */
-    protected $controllerOxxoRoute;
+    protected $controllerSpeiRoute;
 
     /**
      * @var string
      * Execution controller route notification
      */
-    protected $controllerOxxoNotifyRoute;
+    protected $controllerSpeiNotifyRoute;
 
     /**
      * @var string
      * Controller notify name
      */
-    protected $controllerOxxoNotifyRouteName;
+    protected $controllerSpeiNotifyRouteName;
 
     protected $loaded = false;
 
     /**
      * Construct method
      *
-     * @param string $controllerOxxoRouteName Controller route name
-     * @param string $controllerOxxoRoute
-     * @param        $controllerOxxoNotifyRoute
-     * @param        $controllerOxxoNotifyRouteName
+     * @param string $controllerSpeiRouteName Controller route name
+     * @param string $controllerSpeiRoute
+     * @param        $controllerSpeiNotifyRoute
+     * @param        $controllerSpeiNotifyRouteName
      *
      */
     public function __construct(
-        $controllerOxxoRouteName,
-        $controllerOxxoRoute,
-        $controllerOxxoNotifyRoute,
-        $controllerOxxoNotifyRouteName
+        $controllerSpeiRouteName,
+        $controllerSpeiRoute,
+        $controllerSpeiNotifyRoute,
+        $controllerSpeiNotifyRouteName
     ) {
-        $this->controllerOxxoRouteName = $controllerOxxoRouteName;
-        $this->controllerOxxoRoute = $controllerOxxoRoute;
-        $this->controllerOxxoNotifyRoute = $controllerOxxoNotifyRoute;
-        $this->controllerOxxoNotifyRouteName = $controllerOxxoNotifyRouteName;
+        $this->controllerSpeiRouteName = $controllerSpeiRouteName;
+        $this->controllerSpeiRoute = $controllerSpeiRoute;
+        $this->controllerSpeiNotifyRoute = $controllerSpeiNotifyRoute;
+        $this->controllerSpeiNotifyRouteName = $controllerSpeiNotifyRouteName;
     }
     /**
      * @inheritdoc
@@ -72,15 +72,15 @@ class ConektaOxxoRouterLoader implements LoaderInterface
         }
         $routes = new RouteCollection();
         $routes->add(
-            $this->controllerOxxoRouteName,
-            new Route($this->controllerOxxoRoute, array(
-                '_controller' => 'ScastellsConektaBundle:Conekta:executeOxxo',
+            $this->controllerSpeiRouteName,
+            new Route($this->controllerSpeiRoute, array(
+                '_controller' => 'ScastellsConektaBundle:Conekta:executeSpei',
             ))
         );
         $routes->add(
-            $this->controllerOxxoNotifyRouteName,
-            new Route($this->controllerOxxoNotifyRoute, array(
-                '_controller' => 'ScastellsConektaBundle:Conekta:NotifyOxxo',
+            $this->controllerSpeiNotifyRouteName,
+            new Route($this->controllerSpeiNotifyRoute, array(
+                '_controller' => 'ScastellsConektaBundle:Conekta:NotifySpei',
             ))
         );
         $this->loaded = true;
@@ -91,7 +91,7 @@ class ConektaOxxoRouterLoader implements LoaderInterface
      */
     public function supports($resource, $type = null)
     {
-        return 'conekta_oxxo' === $type;
+        return 'conekta_spei' === $type;
     }
     /**
      * @inheritdoc

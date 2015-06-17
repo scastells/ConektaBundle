@@ -11,6 +11,7 @@ use PaymentSuite\PaymentCoreBundle\Exception\PaymentException;
 use Scastells\ConektaBundle\Model\Paymethods\ConektaOxxoPaymentMethod;
 use PaymentSuite\PaymentCoreBundle\Exception\PaymentAmountsNotMatchException;
 use PaymentSuite\PaymentCoreBundle\Services\PaymentEventDispatcher;
+use Scastells\ConektaBundle\Model\PayMethods\ConektaSpeiPaymentMethod;
 
 class ConektaManager
 {
@@ -45,11 +46,9 @@ class ConektaManager
      */
     public function processOxxoPayment($paymentBridge, ConektaOxxoPaymentMethod $paymentMethod)
     {
-        $paymentMethod->setReferenceId($paymentBridge->getOrderId() . '#' . date('Ymdhis'));
-
         $paymentBridgeAmount = $paymentBridge->getAmount();
         $extraData = $paymentBridge->getExtraData();
-
+        $expiresAt = $paymentBridge->getOrder()->getCreatedAt();
         try {
 
             $params = array(
@@ -58,7 +57,7 @@ class ConektaManager
                 "description" => $extraData['description'],
                 "cash" => array(
                     "type"       => $paymentMethod::TYPE_METHOD,
-                    "expires_at" => "2015-06-30"
+                    "expires_at" => $expiresAt->modify('+2 day')
                 )
             );
             $this->conektaWrapper->conektaSetApi();
@@ -68,8 +67,10 @@ class ConektaManager
                 ->setType($charge->payment_method->type)
                 ->setStatus($charge->status)
                 ->setBarCode($charge->payment_method->barcode)
-                ->setBarCoderUrl($charge->payment_method->barcode_url);
-
+                ->setBarCodeUrl($charge->payment_method->barcode_url)
+                ->setReferenceId($paymentBridge->getOrderId())
+                ->setChargeId($charge->id)
+            ;
 
             if ($charge->failure_code != null && $charge->status != 'pending_payment') {
                 $this->paymentEventDispatcher->notifyPaymentOrderFail($paymentBridge, $paymentMethod);
@@ -78,7 +79,57 @@ class ConektaManager
 
             $this->paymentEventDispatcher->notifyPaymentOrderDone($paymentBridge, $paymentMethod);
 
-        }catch (Conekta_Error $e) {
+        }catch (\Conekta_Error $e) {
+
+            throw new PaymentException();
+        }
+    }
+
+
+    /**
+     * @param  payment bridge            $paymentBridge
+     * @param ConektaSpeiPaymentMethod $paymentMethod
+     *
+     * @throws PaymentException
+     */
+    public function processSpeiPayment($paymentBridge, ConektaSpeiPaymentMethod $paymentMethod)
+    {
+        $paymentBridgeAmount = $paymentBridge->getAmount();
+        $extraData = $paymentBridge->getExtraData();
+        $expiresAt = $paymentBridge->getOrder()->getCreatedAt();
+
+        try {
+
+            $params = array(
+                "amount"       => $paymentBridgeAmount * 100,
+                "currency"     => $this->conektaWrapper->getCurrency(),
+                "description"  => $extraData['description'],
+                "reference_id" => $paymentBridge->getOrder()->getId(),
+                "bank" => array(
+                    "type"       => $paymentMethod::TYPE_METHOD,
+                    "expires_at" => $expiresAt->modify('+2 day')
+                )
+            );
+            $this->conektaWrapper->conektaSetApi();
+            $charge = $this->conektaWrapper->conektaCharge($params);
+
+
+            $paymentMethod
+                ->setType($charge->payment_method->type)
+                ->setStatus($charge->status)
+                ->setChargeId($charge->id)
+                ->setReferenceId($paymentBridge->getOrder()->getId())
+                ->setClabe($charge->payment_method->clabe)
+            ;
+
+            if ($charge->failure_code != null && $charge->status != 'pending_payment') {
+                $this->paymentEventDispatcher->notifyPaymentOrderFail($paymentBridge, $paymentMethod);
+                throw new PaymentException();
+            }
+
+            $this->paymentEventDispatcher->notifyPaymentOrderDone($paymentBridge, $paymentMethod);
+
+        }catch (\Conekta_Error $e) {
 
             throw new PaymentException();
         }

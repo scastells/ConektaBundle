@@ -1,3 +1,5 @@
 parameters:
     conekta.oxxo.controller.route.name: "conekta_oxxo_execute"
     conekta.oxxo.controller.route.notify.name: "conekta_oxxo_notify"
+    conekta.spei.controller.route.name: "conekta_spei_execute"
+    conekta.spei.controller.route.notify.name: "conekta_spei_notify"

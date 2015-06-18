@@ -49,6 +49,7 @@ class ConektaManager
         $paymentBridgeAmount = $paymentBridge->getAmount();
         $extraData = $paymentBridge->getExtraData();
         $expiresAt = $paymentBridge->getOrder()->getCreatedAt();
+        $format = $expiresAt->modify('+2 day')->format('Y-m-d');
         try {
 
             $params = array(
@@ -57,7 +58,7 @@ class ConektaManager
                 "description" => $extraData['description'],
                 "cash" => array(
                     "type"       => $paymentMethod::TYPE_METHOD,
-                    "expires_at" => $expiresAt->modify('+2 day')
+                    "expires_at" => $format
                 )
             );
             $this->conektaWrapper->conektaSetApi();
@@ -97,6 +98,7 @@ class ConektaManager
         $paymentBridgeAmount = $paymentBridge->getAmount();
         $extraData = $paymentBridge->getExtraData();
         $expiresAt = $paymentBridge->getOrder()->getCreatedAt();
+        $format = $expiresAt->modify('+2 day')->format('Y-m-d');
 
         try {
 
@@ -107,7 +109,7 @@ class ConektaManager
                 "reference_id" => $paymentBridge->getOrder()->getId(),
                 "bank" => array(
                     "type"       => $paymentMethod::TYPE_METHOD,
-                    "expires_at" => $expiresAt->modify('+2 day')
+                    "expires_at" => $format
                 )
             );
             $this->conektaWrapper->conektaSetApi();

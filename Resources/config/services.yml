@@ -42,3 +42,19 @@ services:
         tags:
             - { name: kernel.event_listener, event: payment.order.done, method: onPaymentOrderDone }
             - { name: kernel.event_listener, event: payment.order.success, method: onPaymentOrderSucces }
+
+    conekta.form.type:
+        class: Scastells\ConektaBundle\From\Type\ConektaType
+        tags:
+            - { name: from.type, alias: conekta_view }
+
+    conekta.twig.extension:
+            class: Scastells\ConektaBundle\Twig\ConektaExtension
+            arguments:
+                stripe.public.key: %conekta.public.key%
+                form.factory: @form.factory
+                payment.bridge: @payment.bridge
+                view_template: %coneta.templates.view_template%
+                scripts_template: %conekta.templates.scripts_template%
+            tags:
+                - { name: twig.extension }

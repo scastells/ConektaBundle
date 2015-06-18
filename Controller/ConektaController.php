@@ -8,6 +8,7 @@
 
 namespace Scastells\ConektaBundle\Controller;
 
+use PaymentSuite\PaymentCoreBundle\Exception\PaymentException;
 use Scastells\ConektaBundle\Model\PayMethods\ConektaOxxoPaymentMethod;
 use PaymentSuite\PaymentCoreBundle\Exception\PaymentOrderNotFoundException;
 use Scastells\ConektaBundle\Model\PayMethods\ConektaSpeiPaymentMethod;
@@ -138,7 +139,70 @@ class ConektaController extends Controller
 
     public function notifySpeiAction()
     {
+        $paymentBridge = $this->get('payment.bridge');
+        $paymentMethod = new ConektaSpeiPaymentMethod();
+
+        $body = @file_get_contents('php://input');
+        $event_json = json_decode($body);
+
+        $this->get('logger')->addInfo(
+            'conekta-doc',
+            array(
+                'id' => $event_json->data->object->id,
+                'status' => $event_json->data->object->status
+            )
+        );
+        $conekta = $this
+            ->getDoctrine()
+            ->getRepository('ScastellsConektaBundle:ConektaOrder')
+            ->findOneBy(array('conektaId' => $event_json->data->object->id));
+
+
+        if ($event_json->type == 'charge.paid') {
+            if($event_json->data->object->status == 'paid' && $conekta->getConektaId() == $event_json->data->object->id) {
+
+                $paymentMethod->setStatus($event_json->data->object->status);
+                $paymentBridge->setOrder($conekta->getOrder());
+                $this->get('payment.event.dispatcher')->notifyPaymentOrderSuccess($paymentBridge, $paymentMethod);
+            }
+        }
         return new Response();
     }
 
+    public function executeCreditCardAction(Request $request)
+    {
+        $form = $this
+            ->get('form.factory')
+            ->create('conekta_credit_card');
+
+        $form->handleRequest($request);
+
+        try {
+
+            if (!$form->isValid()) {
+                throw new PaymentException();
+            }
+
+//            $data = $form->getData();
+//            get a manger an send token to Conekta
+
+            $redirectUrl = $this->container->getParameter('conekta.success.route');
+            $redirectAppend = $this->container->getParameter('conekta.success.order.append');
+            $redirectAppendField = $this->container->getParameter('conekta.success.order.field');
+
+        }catch(PaymentException $e) {
+
+            $redirectUrl = $this->container->getParameter('conekta.fail.route');
+            $redirectAppend = $this->container->getParameter('conekta.fail.order.append');
+            $redirectAppendField = $this->container->getParameter('conekta.fail.order.field');
+        }
+
+        $redirectData   = $redirectAppend
+            ? array(
+                $redirectAppendField => $this->get('payment.bridge')->getOrderId(),
+            )
+            : array();
+
+        return $this->redirect($this->generateUrl($redirectUrl, $redirectData));
+    }
 }

@@ -1,11 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: scastells
- * Date: 18/06/15
- * Time: 18:01
- */
-namespace Scastells\ConektaBundle\From\Type;
+namespace Scastells\ConektaBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -46,6 +40,9 @@ class ConektaType extends AbstractType
         ;
     }
 
+    /**
+     * @return string
+     */
     public function getName()
     {
         return 'conekta_view';

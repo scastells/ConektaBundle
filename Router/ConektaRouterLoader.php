@@ -37,9 +37,8 @@ class ConektaRouterLoader implements LoaderInterface
      * @param        $controllerConekta
      *
      */
-    public function __construct(
-        $controllerConekta
-    ) {
+    public function __construct($controllerConekta)
+    {
         $this->controllerConekta = $controllerConekta;
     }
     /**

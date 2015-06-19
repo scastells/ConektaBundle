@@ -8,6 +8,7 @@
 namespace Scastells\ConektaBundle\Services;
 
 use PaymentSuite\PaymentCoreBundle\Exception\PaymentException;
+use Scastells\ConektaBundle\Model\PayMethods\ConektaCreditCardMethod;
 use Scastells\ConektaBundle\Model\Paymethods\ConektaOxxoPaymentMethod;
 use PaymentSuite\PaymentCoreBundle\Exception\PaymentAmountsNotMatchException;
 use PaymentSuite\PaymentCoreBundle\Services\PaymentEventDispatcher;
@@ -123,6 +124,46 @@ class ConektaManager
                 ->setReferenceId($paymentBridge->getOrder()->getId())
                 ->setClabe($charge->payment_method->clabe)
             ;
+
+            if ($charge->failure_code != null && $charge->status != 'pending_payment') {
+                $this->paymentEventDispatcher->notifyPaymentOrderFail($paymentBridge, $paymentMethod);
+                throw new PaymentException();
+            }
+
+            $this->paymentEventDispatcher->notifyPaymentOrderDone($paymentBridge, $paymentMethod);
+
+        }catch (\Conekta_Error $e) {
+
+            throw new PaymentException();
+        }
+    }
+
+    public function processPayment($paymentBridge, ConektaCreditCardMethod $paymentMethod)
+    {
+        $paymentBridgeAmount = $paymentBridge->getAmount();
+        $extraData = $paymentBridge->getExtraData();
+
+        try {
+
+            $params = array(
+                "amount"       => $paymentBridgeAmount * 100,
+                "currency"     => $this->conektaWrapper->getCurrency(),
+                "description"  => $extraData['description'],
+                "reference_id" => $paymentBridge->getOrder()->getId(),
+                "card"         => $paymentMethod->getTokenId(),
+                "details" => array(
+                    "email"       => $extraData['email'],
+                )
+            );
+            $this->conektaWrapper->conektaSetApi();
+            $charge = $this->conektaWrapper->conektaCharge($params);
+
+
+            $paymentMethod
+                ->setType($charge->payment_method->type)
+                ->setStatus($charge->status)
+                ->setChargeId($charge->id)
+                ->setReferenceId($paymentBridge->getOrder()->getId());
 
             if ($charge->failure_code != null && $charge->status != 'pending_payment') {
                 $this->paymentEventDispatcher->notifyPaymentOrderFail($paymentBridge, $paymentMethod);

@@ -7,7 +7,11 @@
  */
 namespace Scastells\ConektaBundle\Twig;
 
+use Symfony\Component\Form\FormFactory;
 use Twig_Extension;
+use Twig_SimpleFunction;
+use PaymentSuite\PaymentCoreBundle\Services\Interfaces\PaymentBridgeInterface;
+use Scastells\ConektaBundle\Router\ConektaRouterLoader;
 
 class ConektaExtension extends Twig_Extension
 {
@@ -103,9 +107,9 @@ class ConektaExtension extends Twig_Extension
     public function renderPaymentView($viewTemplate = null)
     {
         $formType = $this->formFactory->create('conekta_view');
-        return $this->environment->display($viewTemplate ?: $this->viewTemplate, array(
-            'coekta_form'  =>  $formType->createView(),
-            'conekta_execute_route' =>  ConektaRoutesLoader::ROUTE_NAME,
+        $this->environment->display($viewTemplate ?: $this->viewTemplate, array(
+            'conekta_form' => $formType->createView(),
+            'conekta_execute_route' =>  ConektaRouterLoader::ROUTE_NAME,
         ));
     }
     /**

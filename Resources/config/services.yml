@@ -1,4 +1,9 @@
 services:
+    conekta.form.type:
+        class: Scastells\ConektaBundle\Form\Type\ConektaType
+        tags:
+            - { name: form.type, alias: conekta_view }
+
     conekta.manager:
         class: Scastells\ConektaBundle\Services\ConektaManager
         arguments:
@@ -25,6 +30,13 @@ services:
             tags:
                 - { name: routing.loader }
 
+    conekta_routes.loader:
+        class: Scastells\ConektaBundle\Router\ConektaRouterLoader
+        arguments:
+            - %conekta.controller.route%
+        tags:
+            - { name: routing.loader }
+
     contekta.wrapper:
         class: Scastells\ConektaBundle\Services\ConektaWrapper
         arguments:
@@ -43,10 +55,6 @@ services:
             - { name: kernel.event_listener, event: payment.order.done, method: onPaymentOrderDone }
             - { name: kernel.event_listener, event: payment.order.success, method: onPaymentOrderSucces }
 
-    conekta.form.type:
-        class: Scastells\ConektaBundle\From\Type\ConektaType
-        tags:
-            - { name: from.type, alias: conekta_view }
 
     conekta.twig.extension:
             class: Scastells\ConektaBundle\Twig\ConektaExtension
@@ -54,7 +62,7 @@ services:
                 stripe.public.key: %conekta.public.key%
                 form.factory: @form.factory
                 payment.bridge: @payment.bridge
-                view_template: %coneta.templates.view_template%
+                view_template: %conekta.templates.view_template%
                 scripts_template: %conekta.templates.scripts_template%
             tags:
                 - { name: twig.extension }

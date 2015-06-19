@@ -79,7 +79,6 @@ class ConektaListener
         $oxxoTransaction->setStatus($paymentMethod->getStatus());
         $oxxoTransaction->setOrder($paymentBridge->getOrder());
         $oxxoTransaction->setConektaId($paymentMethod->getChargeId());
-//        $oxxoTransaction->setFailureCode($paymentMethod->getClabe());
 
         $this->entityManager->persist($oxxoTransaction);
         $this->entityManager->flush();

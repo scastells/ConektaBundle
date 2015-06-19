@@ -26,11 +26,14 @@ class ScastellsConektaExtension extends Extension
         $container->setParameter('conekta.api.key', $config['api_key']);
         $container->setParameter('conekta.public.key', $config['public_key']);
         $container->setParameter('conekta.currency', $config['currency']);
+        $container->setParameter('conekta.templates.view_template', $config['templates']['view_template']);
+        $container->setParameter('conekta.templates.scripts_template', $config['templates']['scripts_template']);
         $container->setParameter('conekta.oxxo_execute.route', $config['oxxo_execute_route']);
         $container->setParameter('conekta.oxxo_notify.route', $config['oxxo_notify_route']);
         $container->setParameter('conekta.spei_execute.route', $config['spei_execute_route']);
         $container->setParameter('conekta.spei_notify.route', $config['spei_notify_route']);
         $container->setParameter('conekta.controller.route', $config['controller_route']);
+
         $container->setParameter('conekta.success.route', $config['payment_success']['route']);
         $container->setParameter('conekta.success.order.append', $config['payment_success']['order_append']);
         $container->setParameter('conekta.success.order.field', $config['payment_success']['order_append_field']);

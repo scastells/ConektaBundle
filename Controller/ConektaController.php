@@ -9,6 +9,7 @@
 namespace Scastells\ConektaBundle\Controller;
 
 use PaymentSuite\PaymentCoreBundle\Exception\PaymentException;
+use Scastells\ConektaBundle\Model\PayMethods\ConektaCreditCardMethod;
 use Scastells\ConektaBundle\Model\PayMethods\ConektaOxxoPaymentMethod;
 use PaymentSuite\PaymentCoreBundle\Exception\PaymentOrderNotFoundException;
 use Scastells\ConektaBundle\Model\PayMethods\ConektaSpeiPaymentMethod;
@@ -171,6 +172,8 @@ class ConektaController extends Controller
 
     public function executeCreditCardAction(Request $request)
     {
+        $paymentBridge = $this->get('payment.bridge');
+        $paymentMethod = new ConektaCreditCardMethod();
         $form = $this
             ->get('form.factory')
             ->create('conekta_credit_card');
@@ -183,8 +186,9 @@ class ConektaController extends Controller
                 throw new PaymentException();
             }
 
-//            $data = $form->getData();
-//            get a manger an send token to Conekta
+            $data = $form->getData();
+            $paymentMethod->setTokenId($data['conektaTokenId']);
+            $this->get('conekta.manager')->processPayment($paymentBridge, $paymentMethod);
 
             $redirectUrl = $this->container->getParameter('conekta.success.route');
             $redirectAppend = $this->container->getParameter('conekta.success.order.append');

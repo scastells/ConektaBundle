@@ -22,7 +22,6 @@
     "paymentsuite/payment-core-bundle": "~1.1",
     "conekta/conekta-php": "master"
   },
-  "target-dir": "Scastells/ConektaBundle",
   "autoload": {
     "psr-4": { "Scastells\\ConektaBundle": "" }
   }

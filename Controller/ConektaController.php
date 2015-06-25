@@ -14,6 +14,7 @@ use Scastells\ConektaBundle\Model\PayMethods\ConektaOxxoPaymentMethod;
 use PaymentSuite\PaymentCoreBundle\Exception\PaymentOrderNotFoundException;
 use Scastells\ConektaBundle\Model\PayMethods\ConektaSpeiPaymentMethod;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ConektaController extends Controller
@@ -170,13 +171,13 @@ class ConektaController extends Controller
         return new Response();
     }
 
-    public function executeCreditCardAction(Request $request)
+    public function executeAction(Request $request)
     {
         $paymentBridge = $this->get('payment.bridge');
         $paymentMethod = new ConektaCreditCardMethod();
         $form = $this
             ->get('form.factory')
-            ->create('conekta_credit_card');
+            ->create('conekta_view');
 
         $form->handleRequest($request);
 

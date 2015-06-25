@@ -3,9 +3,33 @@ namespace Scastells\ConektaBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Routing\Router;
 
 class ConektaType extends AbstractType
 {
+    /**
+     * @var Router
+     *
+     * Router instance
+     */
+    private $router;
+
+    /**
+     * @var string
+     *
+     * Execution route name
+     */
+    private $controllerRouteName;
+
+    /**
+     * @param Router $router
+     * @param       $controllerRouteName
+     */
+    public  function __construct(Router $router, $controllerRouteName)
+    {
+        $this->router = $router;
+        $this->controllerRouteName = $controllerRouteName;
+    }
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options the options for this form
@@ -13,6 +37,8 @@ class ConektaType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->setAction($this->router->generate($this->controllerRouteName, array(), true))
+            ->setMethod('POST')
             ->add('credit_card_name', 'text', array(
                 'required' => true,
                 'max_length' => 20,

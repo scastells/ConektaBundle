@@ -1,6 +1,9 @@
 services:
     conekta.form.type:
         class: Scastells\ConektaBundle\Form\Type\ConektaType
+        arguments:
+            - @router
+            - %conekta.controler.route.name%
         tags:
             - { name: form.type, alias: conekta_view }
 

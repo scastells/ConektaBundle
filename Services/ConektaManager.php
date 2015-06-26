@@ -186,6 +186,7 @@ class ConektaManager
             );
 
             $this->conektaWrapper->conektaSetApi();
+            $this->conektaWrapper->conektaSetLocale();
             $charge = $this->conektaWrapper->conektaCharge($params);
 
             $paymentMethod
@@ -200,7 +201,7 @@ class ConektaManager
 
             } elseif ($charge->status == 'pending_payment') {
                 $this->paymentEventDispatcher->notifyPaymentOrderDone($this->paymentBridge, $paymentMethod);
-                
+
             } elseif ($charge->status == 'paid') {
 
                 $this->paymentEventDispatcher->notifyPaymentOrderSuccess($this->paymentBridge, $paymentMethod);

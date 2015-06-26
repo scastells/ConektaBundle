@@ -55,4 +55,9 @@ class ConektaWrapper
     {
         \Conekta::setApiKey($this->apiKey);
     }
+
+    public function conektaSetLocale()
+    {
+        \Conekta::setLocale('es');
+    }
 }

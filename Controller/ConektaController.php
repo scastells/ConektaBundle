@@ -173,7 +173,6 @@ class ConektaController extends Controller
 
     public function executeAction(Request $request)
     {
-        $paymentBridge = $this->get('payment.bridge');
         $paymentMethod = new ConektaCreditCardMethod();
         $form = $this
             ->get('form.factory')
@@ -189,7 +188,8 @@ class ConektaController extends Controller
 
             $data = $form->getData();
             $paymentMethod->setTokenId($data['conektaTokenId']);
-            $this->get('conekta.manager')->processPayment($paymentBridge, $paymentMethod);
+//            $paymentMethod->setTokenId('tok_test_visa_4242');
+            $this->get('conekta.manager')->processPayment($paymentMethod, $data['amount']);
 
             $redirectUrl = $this->container->getParameter('conekta.success.route');
             $redirectAppend = $this->container->getParameter('conekta.success.order.append');

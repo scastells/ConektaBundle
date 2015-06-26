@@ -4,6 +4,7 @@ services:
         arguments:
             - @router
             - %conekta.controler.route.name%
+            - @payment.bridge
         tags:
             - { name: form.type, alias: conekta_view }
 
@@ -12,6 +13,7 @@ services:
         arguments:
             - @payment.event.dispatcher
             - @contekta.wrapper
+            - @payment.bridge
 
     conekta.oxxo_routes.loader:
         class: Scastells\ConektaBundle\Router\ConektaOxxoRouterLoader

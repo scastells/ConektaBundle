@@ -4,6 +4,7 @@ namespace Scastells\ConektaBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Routing\Router;
+use PaymentSuite\PaymentCoreBundle\Services\interfaces\PaymentBridgeInterface;
 
 class ConektaType extends AbstractType
 {
@@ -22,13 +23,19 @@ class ConektaType extends AbstractType
     private $controllerRouteName;
 
     /**
+     * @var PaymentBridgeInterface
+     */
+    private $paymentBridge;
+
+    /**
      * @param Router $router
      * @param       $controllerRouteName
      */
-    public  function __construct(Router $router, $controllerRouteName)
+    public  function __construct(Router $router, $controllerRouteName, PaymentBridgeInterface $paymentBridge)
     {
         $this->router = $router;
         $this->controllerRouteName = $controllerRouteName;
+        $this->paymentBridge = $paymentBridge;
     }
     /**
      * @param FormBuilderInterface $builder
@@ -58,6 +65,9 @@ class ConektaType extends AbstractType
             ->add('credit_card_expiration_month', 'choice', array(
                 'required' => true,
                 'choices' => array_combine(range(1, 12), range(1, 12)),
+            ))
+            ->add('amount', 'hidden', array(
+                'data'  =>  $this->paymentBridge->getAmount(),
             ))
             ->add('credit_card_expiration_year', 'choice', array(
                 'required' => true,

@@ -8,6 +8,8 @@
 namespace Scastells\ConektaBundle\Services;
 
 use PaymentSuite\PaymentCoreBundle\Exception\PaymentException;
+use PaymentSuite\PaymentCoreBundle\Exception\PaymentOrderNotFoundException;
+use PaymentSuite\PaymentCoreBundle\Services\Interfaces\PaymentBridgeInterface;
 use Scastells\ConektaBundle\Model\PayMethods\ConektaCreditCardMethod;
 use Scastells\ConektaBundle\Model\Paymethods\ConektaOxxoPaymentMethod;
 use PaymentSuite\PaymentCoreBundle\Exception\PaymentAmountsNotMatchException;
@@ -28,16 +30,24 @@ class ConektaManager
     protected $conektaWrapper;
 
     /**
+     * @var PaymentBridgeInterface
+     */
+    protected $paymentBridge;
+
+    /**
      * @param PaymentEventDispatcher $paymentEventDispatcher
-     * @param ConektaWrapper $conektaWrapper
+     * @param ConektaWrapper         $conektaWrapper
+     * @param PaymentBridgeInterface $paymentBridge
      */
     public function __construct(
         PaymentEventDispatcher $paymentEventDispatcher,
-        ConektaWrapper $conektaWrapper
+        ConektaWrapper $conektaWrapper,
+        PaymentBridgeInterface $paymentBridge
     )
     {
         $this->paymentEventDispatcher = $paymentEventDispatcher;
         $this->conektaWrapper = $conektaWrapper;
+        $this->paymentBridge = $paymentBridge;
     }
 
     /**
@@ -81,15 +91,14 @@ class ConektaManager
 
             $this->paymentEventDispatcher->notifyPaymentOrderDone($paymentBridge, $paymentMethod);
 
-        }catch (\Conekta_Error $e) {
+        } catch (\Conekta_Error $e) {
 
             throw new PaymentException();
         }
     }
 
-
     /**
-     * @param  payment bridge            $paymentBridge
+     * @param payment bridge           $paymentBridge
      * @param ConektaSpeiPaymentMethod $paymentMethod
      *
      * @throws PaymentException
@@ -116,7 +125,6 @@ class ConektaManager
             $this->conektaWrapper->conektaSetApi();
             $charge = $this->conektaWrapper->conektaCharge($params);
 
-
             $paymentMethod
                 ->setType($charge->payment_method->type)
                 ->setStatus($charge->status)
@@ -132,47 +140,73 @@ class ConektaManager
 
             $this->paymentEventDispatcher->notifyPaymentOrderDone($paymentBridge, $paymentMethod);
 
-        }catch (\Conekta_Error $e) {
+        } catch (\Conekta_Error $e) {
 
             throw new PaymentException();
         }
     }
 
-    public function processPayment($paymentBridge, ConektaCreditCardMethod $paymentMethod)
+    public function processPayment(ConektaCreditCardMethod $paymentMethod, $amount)
     {
-        $paymentBridgeAmount = $paymentBridge->getAmount();
-        $extraData = $paymentBridge->getExtraData();
+
+        $cartAmount = intval($this->paymentBridge->getAmount());
+
+        if (abs($amount - $cartAmount) > 0.00001) {
+            throw new PaymentAmountsNotMatchException();
+        }
+
+        $this->paymentEventDispatcher->notifyPaymentOrderLoad($this->paymentBridge, $paymentMethod);
+
+        /**
+         * At this point, order must be created given a cart, and placed in PaymentBridge
+         *
+         * So, $this->paymentBridge->getOrder() must return an object
+         */
+        if (!$this->paymentBridge->getOrder()) {
+            throw new PaymentOrderNotFoundException();
+        }
+        $extraData = $this->paymentBridge->getExtraData();
+
+        /**
+         * Order exists right here
+         */
+        $this->paymentEventDispatcher->notifyPaymentOrderCreated($this->paymentBridge, $paymentMethod);
 
         try {
 
             $params = array(
-                "amount"       => $paymentBridgeAmount * 100,
+                "amount"       => $cartAmount * 100,
                 "currency"     => $this->conektaWrapper->getCurrency(),
                 "description"  => $extraData['description'],
-                "reference_id" => $paymentBridge->getOrder()->getId(),
+                "reference_id" => $this->paymentBridge->getOrder()->getId(),
                 "card"         => $paymentMethod->getTokenId(),
                 "details" => array(
                     "email"       => $extraData['email'],
                 )
             );
+
             $this->conektaWrapper->conektaSetApi();
             $charge = $this->conektaWrapper->conektaCharge($params);
-
 
             $paymentMethod
                 ->setType($charge->payment_method->type)
                 ->setStatus($charge->status)
                 ->setChargeId($charge->id)
-                ->setReferenceId($paymentBridge->getOrder()->getId());
+                ->setReferenceId($this->paymentBridge->getOrder()->getId());
 
             if ($charge->failure_code != null && $charge->status != 'pending_payment') {
-                $this->paymentEventDispatcher->notifyPaymentOrderFail($paymentBridge, $paymentMethod);
+                $this->paymentEventDispatcher->notifyPaymentOrderFail($this->paymentBridge, $paymentMethod);
                 throw new PaymentException();
+
+            } elseif ($charge->status == 'pending_payment') {
+                $this->paymentEventDispatcher->notifyPaymentOrderDone($this->paymentBridge, $paymentMethod);
+                
+            } elseif ($charge->status == 'paid') {
+
+                $this->paymentEventDispatcher->notifyPaymentOrderSuccess($this->paymentBridge, $paymentMethod);
             }
 
-            $this->paymentEventDispatcher->notifyPaymentOrderDone($paymentBridge, $paymentMethod);
-
-        }catch (\Conekta_Error $e) {
+        } catch (\Conekta_Error $e) {
 
             throw new PaymentException();
         }

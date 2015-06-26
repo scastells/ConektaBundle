@@ -69,7 +69,10 @@ class ConektaListener
         $paymentBridge = $paymentOrderDoneEvent->getPaymentBridge();
         $order = $paymentBridge->getOrder();
 
-        if ($paymentMethod->getPaymentName() == 'conekta_oxxo' || $paymentMethod->getPaymentName() == 'conekta_spei') {
+        if ($paymentMethod->getPaymentName() == 'conekta_oxxo' ||
+            $paymentMethod->getPaymentName() == 'conekta_spei' ||
+            $paymentMethod->getPayemntName() == 'conekta'
+        ) {
             $this->orderManager->toPendingPayment($order);
         }
 
@@ -121,7 +124,10 @@ class ConektaListener
 
         $order = $paymentBridge->getOrder();
 
-        if ($paymentMethod->getPaymentName() == 'conekta_oxxo' || $paymentMethod->getPaymentName() == 'conekta_spei') {
+        if ($paymentMethod->getPaymentName() == 'conekta_oxxo' ||
+            $paymentMethod->getPaymentName() == 'conekta_spei' ||
+            $paymentMethod->getPaymentName() == 'conekta'
+        ) {
             $this->orderManager->toAccepted($order);
         }
 

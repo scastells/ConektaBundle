@@ -58,7 +58,7 @@ services:
             - @baseecommerce.core.purchase.services.order_manager
         tags:
             - { name: kernel.event_listener, event: payment.order.done, method: onPaymentOrderDone }
-            - { name: kernel.event_listener, event: payment.order.success, method: onPaymentOrderSucces }
+            - { name: kernel.event_listener, event: payment.order.success, method: onPaymentOrderSuccess }
 
 
     conekta.twig.extension:

@@ -173,7 +173,15 @@ class ConektaManager
         $this->paymentEventDispatcher->notifyPaymentOrderCreated($this->paymentBridge, $paymentMethod);
 
         try {
-
+            $items = array();
+            foreach ($this->paymentBridge->getOrder()->getLines() as $line) {
+                $items[] = array(
+                    'name'          => $line->getItemPlain(),
+                    'unit_price'    => $line->getItem()->getPrice(),
+                    'quantity'      => $line->getQuantity(),
+                    'sku'           => $line->getItem()->getReference()
+                );
+            }
             $params = array(
                 "amount"       => $cartAmount * 100,
                 "currency"     => $this->conektaWrapper->getCurrency(),
@@ -181,8 +189,11 @@ class ConektaManager
                 "reference_id" => $this->paymentBridge->getOrder()->getId(),
                 "card"         => $paymentMethod->getTokenId(),
                 "details" => array(
-                    "email"       => $extraData['email'],
-                )
+                    "name"  => $extraData['customer_firstname'],
+                    "phone" => $extraData['customer_phone'],
+                    "email" => $extraData['customer_email'],
+                ),
+                "line_items" => $items
             );
 
             $this->conektaWrapper->conektaSetApi();

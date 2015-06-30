@@ -1,9 +1,4 @@
 {% block payment_form %}
-
-    <ul id="conekta_payment_error">
-
-    </ul>
-
     {{ form_start(conekta_form, {action: url(conekta_execute_route), attr: {"id" : "card-form", "method": "POST"}}) }}
     <span class="payment-errors"></span>
 

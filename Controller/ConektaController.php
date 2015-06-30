@@ -187,8 +187,7 @@ class ConektaController extends Controller
             }
 
             $data = $form->getData();
-            $paymentMethod->setTokenId($data['conektaTokenId']);
-//            $paymentMethod->setTokenId('tok_test_visa_4242');
+            $paymentMethod->setTokenId($data['token_id']);
             $this->get('conekta.manager')->processPayment($paymentMethod, $data['amount']);
 
             $redirectUrl = $this->container->getParameter('conekta.success.route');

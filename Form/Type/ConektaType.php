@@ -69,6 +69,9 @@ class ConektaType extends AbstractType
             ->add('amount', 'hidden', array(
                 'data'  =>  $this->paymentBridge->getAmount(),
             ))
+            ->add('token_id', 'hidden', array(
+                'data' => ''
+            ))
             ->add('credit_card_expiration_year', 'choice', array(
                 'required' => true,
                 'choices' => array_combine(range(date('Y'), 2025), range(date('Y'), 2025)),

@@ -13,7 +13,7 @@
             var $form;
             $form = $("#card-form");
             /* Inserta el token_id en la forma para que se envíe al servidor */
-            $form.append($("<input type=\"hidden\" name=\"conektaTokenId\" />").val(token.id));
+            $("#conekta_view_token_id").val(token.id);
             /* and submit */
             $form.get(0).submit();
         };
@@ -26,10 +26,8 @@
             var $form;
             $form = $("#card-form");
 
-
             /* Muestra los errores en la forma */
-            console.log(response.message);
-            $form.find(".payment-errors").text(response.message);
+            $form.find(".payment-errors").text(response.message_to_purchaser);
             $form.find("button").prop("disabled", false);
         };
 
